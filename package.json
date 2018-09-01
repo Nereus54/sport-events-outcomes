@@ -1,0 +1,30 @@
+{
+  "name": "sport-events",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "async": "^2.6.0",
+    "axios": "^0.18.0",
+    "body-parser": "~1.18.2",
+    "consign": "^0.1.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "express-enforces-ssl": "^1.1.0",
+    "express-no-favicons": "0.0.1",
+    "express-validator": "^5.0.3",
+    "helmet": "^3.11.0",
+    "hpp": "^0.2.2",
+    "moment": "^2.21.0",
+    "morgan": "~1.9.0",
+    "pg": "^7.4.1",
+    "pug": "^2.0.3",
+    "redis": "^2.8.0",
+    "sequelize": "^4.33.4",
+    "sequelize-cli": "^4.0.0",
+    "winston": "^2.4.0"
+  }
+}
