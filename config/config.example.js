@@ -9,6 +9,13 @@ module.exports = {
             fallbackLanguage: "en-gb",
         },
     },
+    test: {
+        dataResource: {
+            URL: "http://betvictor.test",
+            URI: "live/live/list",
+            fallbackLanguage: "en-gb",
+        },
+    },
     production: {
         dataResource: {
             URL: "http://betvictor.test",
