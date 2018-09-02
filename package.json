@@ -17,6 +17,7 @@
     "express-enforces-ssl": "^1.1.0",
     "express-no-favicons": "0.0.1",
     "express-validator": "^5.0.3",
+    "flatted": "^0.2.3",
     "helmet": "^3.11.0",
     "hpp": "^0.2.2",
     "moment": "^2.21.0",

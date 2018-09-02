@@ -12,7 +12,7 @@ module.exports = {
             name: "sports"
         }];
 
-        dataResource.getData(searchItems, req.query.lang || null)
+        dataResource.getData(searchItems, getLanguage(req))
             .then(data => {
 
                 // Obey the list order as per upstream API 'pos' property
@@ -43,7 +43,7 @@ module.exports = {
             id: parseInt(req.params.sportId, 10),
         }];
 
-        dataResource.getData(searchItems, req.query.lang || null)
+        dataResource.getData(searchItems, getLanguage(req))
             .then(data => {
 
                 return res.send(data['events'] || []);
@@ -58,8 +58,6 @@ module.exports = {
 
     getAllEventOutcomes(req, res) {
 
-        const lang = req.query.lang || null;
-
         const searchItems = [
             {
                 name: "sports",
@@ -69,7 +67,7 @@ module.exports = {
 
         const eventId = parseInt(req.params.eventId, 10);
 
-        dataResource.getData(searchItems, lang)
+        dataResource.getData(searchItems, getLanguage(req))
             .then(data => {
 
                 const events = data['events'];
@@ -91,3 +89,14 @@ module.exports = {
     }
 
 };
+
+/**
+ * Get language or fallback
+ *
+ * @param req
+ * @returns {string}
+ */
+function getLanguage(req) {
+
+    return req.query.lang || helper.getFallbackLanguage();
+}

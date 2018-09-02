@@ -51,4 +51,14 @@ module.exports = {
         });
     },
 
+    /**
+     * Get fallback language from config
+     *
+     * @returns {string}
+     */
+    getFallbackLanguage() {
+
+        return config.dataResource.fallbackLanguage || "";
+    },
+
 };

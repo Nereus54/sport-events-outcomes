@@ -1,13 +1,43 @@
 'use strict';
 
 const
-    async = require('async'),
-    axios = require('axios'),
-    helper = require('../helper/helper');
+    async               = require('async'),
+    axios               = require('axios'),
+    helper              = require('../helper/helper'),
+    redis               = require("redis"),
+    promisify           = require('util').promisify,
+    {parse, stringify}  = require('flatted/cjs');
+
+const
+    client   = redis.createClient(),
+    getAsync = promisify(client.get).bind(client),
+    setAsync = promisify(client.set).bind(client);
 
 module.exports = {
 
     /**
+     * Fetch data from API upstream
+     *
+     * @param language
+     * @returns {Promise<any>}
+     */
+    fetchDataResource(language) {
+
+        return new Promise((resolve, reject) => {
+            axios.get(helper.getDataResourceURL(language))
+                .then(response => {
+
+                    return resolve(response);
+                })
+                .catch(error => {
+
+                    return reject(error);
+                })
+        });
+    },
+
+    /**
+     * Get cached data or fetch data if needed
      *
      * @param language
      * @returns {Promise<any>}
@@ -16,14 +46,42 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
 
-            axios.get(helper.getDataResourceURL(language))
-                .then(response => {
+            const dataCacheKey = `data_set_${sanitazeLanguage(language)}_2`;
 
-                    return resolve(response);
+            // Check if we got data in cache
+            getAsync(dataCacheKey)
+                .then(cachedData => {
+
+                    if (cachedData) {
+
+                        // Serve the data
+                        return resolve(parse(cachedData));
+                    } else {
+                        // Fetch data from API upstream
+                        this.fetchDataResource(language)
+                            .then(fetchedData => {
+
+                                // Store data in to the cache
+                                setAsync(dataCacheKey, stringify(fetchedData))
+                                    .then(() => {
+
+                                        // Serve the data
+                                        return resolve(fetchedData);
+                                    })
+                                    .catch(error => {
+
+                                        return reject(error);
+                                    });
+                            })
+                            .catch(error => {
+
+                                return reject(error);
+                            });
+                    }
                 })
                 .catch(error => {
                     return reject(error);
-                })
+                });
         });
     },
 
@@ -131,4 +189,14 @@ function resolveData(data, node) {
             return resolve(data);
         });
     });
+}
+
+/**
+ *
+ * @param language
+ * @returns {string}
+ */
+function sanitazeLanguage(language) {
+
+    return language.replace(" ", "_").toLowerCase();
 }
