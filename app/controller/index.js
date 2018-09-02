@@ -1,7 +1,8 @@
 'use strict';
 
-const SportEvents = require('./sportEvents');
+const
+    SportEvent   = require('./sportEvent');
 
 module.exports = {
-    SportEvents,
+    SportEvent,
 };

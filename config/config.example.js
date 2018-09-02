@@ -1,62 +1,25 @@
 module.exports = {
     port: 8080,
-    environment:"production",
+    environment:"development",
+
     development: {
-        username: "example_user",
-        password: "secret",
-        database: "example_db",
-        host: "127.0.0.1",
-        port: 5432,
-        dialect: "postgres",
-        operatorsAliases: false,
-        quoteIdentifiers: true,
-        define: {
-            underscored: true,
-            freezeTableName: true,
-            charset: 'utf8',
-            dialectOptions: {
-                collate: 'utf8_general_ci'
-            },
-            timestamps: true
+        dataResource: {
+            URL: "http://betvictor.test",
+            URI: "betvictor.json",
+            fallbackLanguage: "en-gb",
         },
-        pool: {
-            max: 5,
-            min: 0,
-            idle: 10000
-        }
-    },
-    test: {
-        username: "example_user",
-        password: "secret",
-        database: "example_db",
-        host: "127.0.0.1",
-        port: 5432,
-        dialect: "postgres",
-        operatorsAliases: false,
-        quoteIdentifiers: true,
     },
     production: {
-        username: "example_user",
-        password: "secret",
-        database: "example_db",
-        host: "127.0.0.1",
-        port: 5432,
-        dialect: "postgres",
-        operatorsAliases: false,
-        quoteIdentifiers: true,
-        define: {
-            underscored: true,
-            freezeTableName: false,
-            charset: 'utf8',
-            dialectOptions: {
-                collate: 'utf8_general_ci'
-            },
-            timestamps: true
+        dataResource: {
+            URL: "http://betvictor.test",
+            URI: "live/live/list",
+            fallbackLanguage: "en-gb",
         },
-        pool: {
-            max: 5,
-            min: 0,
-            idle: 10000
+
+        redis: {
+            host: "127.0.0.1",
+            port: 6379,
+            password: null,
         }
     },
 };
