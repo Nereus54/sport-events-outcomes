@@ -124,31 +124,6 @@ module.exports = {
         });
     },
 
-    getFromPassedData(searchNodes = [], data = []) {
-
-        return new Promise((resolve, reject) => {
-
-            if (!data) {
-
-                return reject("Could not process empty data!");
-            }
-
-            // return all data
-            if (!Array.isArray(searchNodes) || searchNodes.length === 0) {
-
-                return resolve(data);
-            }
-
-            resolveData(data, searchNodes[0])
-                .then(result => {
-                    return resolve(result);
-                })
-                .catch(error => {
-                    return reject(error);
-                });
-        });
-    }
-
 };
 
 /**
