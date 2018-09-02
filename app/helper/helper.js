@@ -61,4 +61,19 @@ module.exports = {
         return config.dataResource.fallbackLanguage || "";
     },
 
+    /**
+     * Return error response
+     *
+     * @param res
+     * @param error
+     * @param code
+     * @returns {*}
+     */
+    getErrorResponse(res, error, code = 400) {
+        global.logger.error(error);
+        console.log(error);
+
+        return res.sendStatus(code);
+    }
+
 };

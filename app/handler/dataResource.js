@@ -9,9 +9,9 @@ const
     {parse, stringify}  = require('flatted/cjs');
 
 const
-    client   = redis.createClient(),
-    getAsync = promisify(client.get).bind(client),
-    setAsync = promisify(client.set).bind(client);
+    client        = redis.createClient(),
+    cacheGetAsync = promisify(client.get).bind(client),
+    cacheSetAsync = promisify(client.set).bind(client);
 
 module.exports = {
 
@@ -46,14 +46,14 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
 
-            const dataCacheKey = `data_set_${sanitazeLanguage(language)}_2`;
+            const dataCacheKey = `data_set_${sanitazeLanguage(language)}_upstream`;
 
             // Check if we got data in cache
-            getAsync(dataCacheKey)
+            cacheGetAsync(dataCacheKey)
                 .then(cachedData => {
 
                     if (cachedData) {
-
+                        //console.log("GOT DATA FROM :: CACHE :: getResourceData");
                         // Serve the data
                         return resolve(parse(cachedData));
                     } else {
@@ -62,7 +62,7 @@ module.exports = {
                             .then(fetchedData => {
 
                                 // Store data in to the cache
-                                setAsync(dataCacheKey, stringify(fetchedData))
+                                cacheSetAsync(dataCacheKey, stringify(fetchedData))
                                     .then(() => {
 
                                         // Serve the data

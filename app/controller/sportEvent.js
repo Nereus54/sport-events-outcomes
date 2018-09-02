@@ -1,11 +1,25 @@
 'use strict';
 
 const
-    helper       = require('../helper/helper'),
-    dataResource = require('../handler/dataResource');
+    helper              = require('../helper/helper'),
+    dataResource        = require('../handler/dataResource'),
+    promisify           = require('util').promisify,
+    redis               = require("redis"),
+    {parse, stringify}  = require('flatted/cjs');
+
+const
+    client        = redis.createClient(),
+    cacheGetAsync = promisify(client.get).bind(client),
+    cacheSetAsync = promisify(client.set).bind(client);
 
 module.exports = {
 
+    /**
+     * Method to list all sports
+     *
+     * @param req
+     * @param res
+     */
     getAllSports(req, res) {
 
         const searchItems = [{
@@ -29,13 +43,17 @@ module.exports = {
                 return res.send(data || []);
             })
             .catch(error => {
-                global.logger.error(error);
-                console.log(error);
 
-                return res.sendStatus(400);
+                return helper.getErrorResponse(res, error);
             });
     },
 
+    /**
+     * Method to list all events for a given sport
+     *
+     * @param req
+     * @param res
+     */
     getAllSportEvents(req, res) {
 
         const searchItems = [{
@@ -43,19 +61,46 @@ module.exports = {
             id: parseInt(req.params.sportId, 10),
         }];
 
-        dataResource.getData(searchItems, getLanguage(req))
-            .then(data => {
+        const cacheKey = `data_set_sports_${searchItems[0].id}`;
 
-                return res.send(data['events'] || []);
+        cacheGetAsync(cacheKey)
+            .then(cachedData => {
+                if (cachedData) {
+                    //console.log("GOT DATA FROM :: CACHE :: getAllSportEvents");
+
+                    return res.send(parse(cachedData));
+                } else {
+
+                    dataResource.getData(searchItems, getLanguage(req))
+                        .then(data => {
+
+                            cacheSetAsync(cacheKey, stringify(data['events']))
+                                .then(() => {
+                                    return res.send(data['events'] || []);
+                                })
+                                .catch(error => {
+
+                                    return helper.getErrorResponse(res, error);
+                                });
+                        })
+                        .catch(error => {
+
+                            return helper.getErrorResponse(res, error);
+                        });
+                }
             })
             .catch(error => {
-                global.logger.error(error);
-                console.log(error);
 
-                return res.sendStatus(400);
+                return helper.getErrorResponse(res, error);
             });
     },
 
+    /**
+     * Method to list all outcomes for a given event
+     *
+     * @param req
+     * @param res
+     */
     getAllEventOutcomes(req, res) {
 
         const searchItems = [
@@ -67,31 +112,55 @@ module.exports = {
 
         const eventId = parseInt(req.params.eventId, 10);
 
-        dataResource.getData(searchItems, getLanguage(req))
-            .then(data => {
+        const cacheKey = `data_set_sports_${searchItems[0].id}_events_${eventId}`;
 
-                const events = data['events'];
+        cacheGetAsync(cacheKey)
+            .then(cachedData => {
+                if (cachedData) {
+                    //console.log("GOT DATA FROM :: CACHE :: getAllEventOutcomes");
 
-                helper.findObjectInArrayById(events, eventId)
-                    .then(eventData => {
-                        return res.send(eventData['outcomes'] || []);
-                    })
-                    .catch(error => {
-                        return res.status(400).send(error);
-                    });
+                    return res.send(parse(cachedData));
+                } else {
+
+                    dataResource.getData(searchItems, getLanguage(req))
+                        .then(data => {
+
+                            const events = data['events'];
+
+                            helper.findObjectInArrayById(events, eventId)
+                                .then(eventData => {
+
+                                    cacheSetAsync(cacheKey, stringify(eventData['outcomes']))
+                                        .then(() => {
+
+                                            return res.send(eventData['outcomes'] || []);
+                                        })
+                                        .catch(error => {
+
+                                            return helper.getErrorResponse(res, error);
+                                        });
+                                })
+                                .catch(error => {
+
+                                    return helper.getErrorResponse(res, error);
+                                });
+                        })
+                        .catch(error => {
+
+                            return helper.getErrorResponse(res, error);
+                        });
+                }
             })
             .catch(error => {
-                global.logger.error(error);
-                console.log(error);
 
-                return res.sendStatus(400);
+                return helper.getErrorResponse(res, error);
             });
     }
 
 };
 
 /**
- * Get language or fallback
+ * Get language or fallback to default one
  *
  * @param req
  * @returns {string}
