@@ -38,8 +38,6 @@ app.use(cookieParser());
 app.set('view engine', 'pug');
 app.use(express.static('public'));
 
-// global.mailer = expressMailer.extend(app, mailConfig);
-
 consign()
     .include("route")
     .then("lib/error/errorHandling.js")
