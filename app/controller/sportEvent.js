@@ -15,6 +15,17 @@ module.exports = {
         dataResource.getData(searchItems, req.query.lang || null)
             .then(data => {
 
+                // Obey the list order as per upstream API 'pos' property
+                if (data) {
+                    data.sort((a,b) => {
+                        if (a.pos < b.pos)
+                            return -1;
+                        if (a.pos > b.pos)
+                            return 1;
+                        return 0;
+                    });
+                }
+
                 return res.send(data || []);
             })
             .catch(error => {
