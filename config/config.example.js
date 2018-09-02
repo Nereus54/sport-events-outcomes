@@ -1,6 +1,6 @@
 module.exports = {
     port: 8080,
-    environment:"development",
+    environment:"production",
 
     development: {
         dataResource: {
